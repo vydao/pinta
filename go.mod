@@ -1,4 +1,4 @@
-module pinta.com/pinta
+module pinta.com
 
 go 1.17
 
