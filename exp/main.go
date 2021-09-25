@@ -45,13 +45,13 @@ func main() {
 	db.AutoMigrate(&User{}, &Order{})
 
 	var user User
-	db.First(&user)
+	db.Preload("Orders").First(&user)
 	if db.Error != nil {
 		panic(db.Error)
 	}
-
-	createOrder(db, user, 1000, "Purchased item #1")
-	createOrder(db, user, 999, "Purchased item #2")
+	fmt.Println("Email: ", user.Email)
+	fmt.Println("Number of orders: ", len(user.Orders))
+	fmt.Printf("Orders: %+v", user.Orders)
 }
 
 func getInfo() (name, email string) {
