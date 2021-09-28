@@ -9,6 +9,7 @@ import (
 
 var (
 	ErrNotFound = errors.New("models: resource not found")
+	ErrInvalidID = errors.New("models: ID provided was invalid")
 )
 
 type UserService struct{
@@ -40,9 +41,12 @@ func (us *UserService) ByID(id uint) (*User, error)  {
 	return &user, nil
 }
 
-func (us *UserService) DestructiveReset()  {
-	us.db.DropTableIfExists(&User{})
-	us.db.AutoMigrate(&User{})
+func (us *UserService) DestructiveReset() error {
+  	err := us.db.DropTableIfExists(&User{}).Error
+  	if err != nil {
+		return err
+  	}
+  	return us.AutoMigrate()
 }
 
 func (us *UserService) Create(user *User) error {
@@ -55,4 +59,30 @@ func first(db *gorm.DB, dst interface{}) error  {
 		return ErrNotFound
 	}
 	return err
+}
+
+func (us *UserService) ByEmail(email string) (*User, error)  {
+	var user User
+	db := us.db.Where("email = ?", email)
+	err := first(db, &user)
+	return &user, err
+}
+
+func (us *UserService) Update(user *User) error {
+	return us.db.Save(user).Error
+}
+
+func (us *UserService) Delete(id uint) error {
+	if id == 0 {
+		return ErrInvalidID
+	}
+	user := User{Model: gorm.Model{ID: id}}
+	return us.db.Delete(&user).Error
+}
+
+func (us *UserService) AutoMigrate() error {
+  if err := us.db.AutoMigrate(&User{}).Error; err != nil {
+    return err
+}
+return nil
 }

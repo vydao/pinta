@@ -6,9 +6,17 @@ import (
 	"text/template"
 
 	"pinta.com/controllers"
+	"pinta.com/models"
 	"pinta.com/views"
 
 	"github.com/gorilla/mux"
+)
+
+const (
+	host   = "localhost"
+	port   = 5432
+	user   = "postgres"
+	dbname = "pinta_dev"
 )
 
 var homeView *views.View
@@ -34,6 +42,15 @@ var notFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reque
 })
 
 func main() {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable",
+		host, port, user, dbname)
+	us, err := models.NewUserService(psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer us.Close()
+	us.AutoMigrate()
+
 	homeView = views.NewView("views/home.gohtml")
 	usersC := controllers.NewUsers()
 
