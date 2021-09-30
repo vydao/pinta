@@ -12,12 +12,18 @@ var (
 	ErrInvalidID = errors.New("models: ID provided was invalid")
 )
 
+type User struct {
+  gorm.Model
+  Name  string
+  Email string `gorm:"not null;unique_index"`
+}
+
 type UserService struct{
 	db *gorm.DB
 }
 
 func NewUserService(connectionInfo string) (*UserService, error) {
-	db, err != gorm.Open("postgres", conconnectionInfo)
+	db, err != gorm.Open("postgres", connectionInfo)
 	if err != nil {
 		return nil, err
 	}

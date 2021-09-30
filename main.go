@@ -52,7 +52,7 @@ func main() {
 	us.AutoMigrate()
 
 	homeView = views.NewView("views/home.gohtml")
-	usersC := controllers.NewUsers()
+	usersC := controllers.NewUsers(us)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", home).Methods("GET")
